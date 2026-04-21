@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VNIndex GitHub Pages</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-a: #0b1f33;
+      --bg-b: #174f71;
+      --ink: #e8f5ff;
+      --muted: #a4c8e2;
+      --accent: #7fffd4;
+      --danger: #ff7995;
+      --line: rgba(164, 200, 226, 0.25);
+      --card: rgba(6, 18, 29, 0.7);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      color: var(--ink);
+      min-height: 100vh;
+      background:
+        radial-gradient(900px 500px at 10% -20%, rgba(127,255,212,0.18), transparent 60%),
+        radial-gradient(1000px 500px at 100% 0%, rgba(85,175,255,0.2), transparent 58%),
+        linear-gradient(160deg, var(--bg-a), var(--bg-b));
+    }
+    .wrap { width: min(1100px, 94vw); margin: 24px auto; display: grid; gap: 16px; }
+    .panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; backdrop-filter: blur(8px); }
+    .head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 20px; flex-wrap: wrap; }
+    h1 { margin:0; font-size:clamp(1.2rem,3.2vw,1.8rem); }
+    .controls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    select, button { padding:10px 12px; border-radius:10px; border:1px solid var(--line); color:var(--ink); background:rgba(0,0,0,0.2); font:inherit; }
+    button { background: linear-gradient(135deg, #1fd7b3, #38abff); color:#002136; border:none; font-weight:700; cursor:pointer; }
+    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; padding:0 20px 20px; }
+    .stat { border:1px solid var(--line); border-radius:12px; padding:12px; background:rgba(0,0,0,0.15); }
+    .label { color:var(--muted); font-size:0.88rem; }
+    .value { margin-top:6px; font-size:1.1rem; font-weight:700; }
+    .table-wrap { padding: 0 20px 20px; overflow:auto; }
+    table { width:100%; min-width:720px; border-collapse:collapse; }
+    th, td { text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+    th { color:var(--muted); font-weight:500; }
+    .pos { color: var(--accent); font-weight:700; }
+    .neg { color: var(--danger); font-weight:700; }
+    .foot { padding:0 20px 20px; color:var(--muted); font-size:0.92rem; }
+    .err { display:none; margin: 0 20px 20px; padding:12px; border:1px solid rgba(255,121,149,0.4); border-radius:12px; background: rgba(255,121,149,0.12); }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="panel">
+      <div class="head">
+        <h1>VNIndex on GitHub Pages</h1>
+        <div class="controls">
+          <select id="refreshSec" aria-label="Chu kỳ tự động tải">
+            <option value="0">Tắt auto refresh</option>
+            <option value="5">5 giây</option>
+            <option value="10" selected>10 giây</option>
+          </select>
+          <button id="loadBtn">Tải dữ liệu SHB</button>
+        </div>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="err" id="err"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Mở cửa</th>
+              <th>Cao nhất</th>
+              <th>Thấp nhất</th>
+              <th>Đóng cửa</th>
+              <th>Khối lượng</th>
+              <th>Biến động</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="foot" id="foot">Đang chờ dữ liệu...</div>
+    </section>
+  </main>
+
+  <script>
+    const stats = document.getElementById("stats");
+    const rows = document.getElementById("rows");
+    const foot = document.getElementById("foot");
+    const err = document.getElementById("err");
+    const refreshSec = document.getElementById("refreshSec");
+    const dataUrl = "./data/shb_30d_latest.json";
+
+    let refreshTimer = null;
+
+    function fmtPrice(v) { return Number(v || 0).toFixed(2); }
+    function fmtNum(v) { return new Intl.NumberFormat("vi-VN").format(Number(v || 0)); }
+
+    function renderStats(payload) {
+      const data = payload.data || [];
+      const last = data[data.length - 1] || {};
+      const prev = data[data.length - 2] || {};
+      const delta = Number(last.close || 0) - Number(prev.close || 0);
+      const cls = delta >= 0 ? "pos" : "neg";
+      const sign = delta >= 0 ? "+" : "";
+
+      stats.innerHTML = [
+        ["Mã", payload.symbol || "SHB"],
+        ["Nguồn", payload.source_used || "-"],
+        ["Số phiên", payload.rows || 0],
+        ["Đóng cửa gần nhất", fmtPrice(last.close)],
+        ["Biến động", `<span class=\"${cls}\">${sign}${fmtPrice(delta)}</span>`]
+      ].map(([label, value]) => `
+        <article class="stat">
+          <div class="label">${label}</div>
+          <div class="value">${value}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderRows(payload) {
+      const data = payload.data || [];
+      rows.innerHTML = data.slice().reverse().map((r, idx) => {
+        const prev = data[data.length - idx - 2];
+        const delta = prev ? Number(r.close) - Number(prev.close) : 0;
+        const cls = delta >= 0 ? "pos" : "neg";
+        const sign = delta >= 0 ? "+" : "";
+        return `
+          <tr>
+            <td>${new Date(r.time).toLocaleString("vi-VN")}</td>
+            <td>${fmtPrice(r.open)}</td>
+            <td>${fmtPrice(r.high)}</td>
+            <td>${fmtPrice(r.low)}</td>
+            <td>${fmtPrice(r.close)}</td>
+            <td>${fmtNum(r.volume)}</td>
+            <td class="${cls}">${sign}${fmtPrice(delta)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function loadData() {
+      err.style.display = "none";
+      foot.textContent = "Dang tai du lieu...";
+      try {
+        const resp = await fetch(`${dataUrl}?ts=${Date.now()}`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const payload = await resp.json();
+        renderStats(payload);
+        renderRows(payload);
+        const updated = payload.updated_at || "khong ro";
+        foot.textContent = `Cap nhat du lieu: ${updated} | Tu dong refresh giao dien moi ${refreshSec.value || 0}s`;
+      } catch (e) {
+        err.textContent = `Loi tai du lieu: ${e.message}`;
+        err.style.display = "block";
+        foot.textContent = "Khong tai duoc du lieu";
+      }
+    }
+
+    function startAutoRefresh() {
+      if (refreshTimer) {
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+      }
+      const sec = Number(refreshSec.value || "0");
+      if (sec <= 0) return;
+      refreshTimer = setInterval(loadData, sec * 1000);
+    }
+
+    document.getElementById("loadBtn").addEventListener("click", loadData);
+    refreshSec.addEventListener("change", () => {
+      startAutoRefresh();
+      loadData();
+    });
+
+    startAutoRefresh();
+    loadData();
+  </script>
+</body>
+</html>

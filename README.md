@@ -82,20 +82,31 @@ Repo đang dùng:
 
 Bạn có thể đẩy code web app này lên cùng repo để triển khai online trên các nền tảng như Render, Railway, hoặc Azure App Service.
 
-## Publish online từ GitHub
+## Chay online tren GitHub Pages
 
-Bạn có thể publish từ GitHub account `https://github.com/pmtuan1988` theo luồng sau:
+Ban muon chay tren GitHub thi dung luong nay (khong qua Render):
 
-1. Push code này lên repo, ví dụ `https://github.com/pmtuan1988/VNIndex`
-2. Vào Render, chọn `New +` -> `Blueprint`
-3. Kết nối repo GitHub trên
-4. Render sẽ đọc file `render.yaml` trong repo và tự tạo web service
-5. Sau khi deploy xong, bạn sẽ có URL public để xem online
+1. Push code len repo `https://github.com/pmtuan1988/VNIndex`
+2. Vao `Settings` -> `Pages`
+3. Tai `Build and deployment`, chon `Source = GitHub Actions`
+4. Chay workflow `Update Pages Data` (run tay 1 lan dau)
+5. Workflow `Deploy GitHub Pages` se publish web trong `docs/`
 
-Lưu ý:
+URL du kien:
 
-- GitHub Pages không chạy được backend FastAPI/Python.
-- Với app này, nên dùng Render/Railway/Azure để có backend API hoạt động.
+- `https://pmtuan1988.github.io/VNIndex/`
+
+Da co san trong repo:
+
+- Frontend GitHub Pages: `docs/index.html`
+- Du lieu cho Pages: `docs/data/shb_30d_latest.json`
+- Workflow cap nhat du lieu 10 phut/lần: `.github/workflows/update-pages-data.yml`
+- Workflow deploy Pages: `.github/workflows/deploy-pages.yml`
+
+Luu y ky thuat:
+
+- GitHub Pages la static hosting, khong chay backend FastAPI.
+- Auto refresh 5-10 giay tren giao dien da co, nhung file du lieu duoc cap nhat theo lich GitHub Actions (10 phut/lần).
 
 ### Deploy bằng Docker
 
