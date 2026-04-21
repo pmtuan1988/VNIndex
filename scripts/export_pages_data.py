@@ -39,6 +39,7 @@ def _fetch_shb(symbol: str = "SHB", days: int = 30):
             }
         except Exception as exc:  # noqa: BLE001
             errors[source] = str(exc)
+ 
 
     raise RuntimeError(f"All sources failed: {errors}")
 

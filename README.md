@@ -67,7 +67,11 @@ Mở trình duyệt:
 API:
 
 - `GET /api/stock/SHB?days=30`
+- `GET /api/stock/{SYMBOL}?days=30`
+- `GET /api/vn30`
 - `GET /health`
+
+UI web app da ho tro danh sach VN30 va tim kiem theo ma.
 
 UI hiện có auto refresh:
 

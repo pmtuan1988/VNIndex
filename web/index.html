@@ -156,7 +156,8 @@
       <div class="head">
         <h1>VNIndex Live Board</h1>
         <div class="controls">
-          <input id="symbol" maxlength="5" value="SHB" aria-label="Mã cổ phiếu" />
+          <input id="symbol" list="vn30List" maxlength="5" value="SHB" aria-label="Mã cổ phiếu" placeholder="Tim ma VN30" />
+          <datalist id="vn30List"></datalist>
           <select id="days" aria-label="Số phiên">
             <option value="15">15 phiên</option>
             <option value="30" selected>30 phiên</option>
@@ -199,6 +200,14 @@
     const foot = document.getElementById("foot");
     const err = document.getElementById("err");
     const refreshSec = document.getElementById("refreshSec");
+    const vn30ListEl = document.getElementById("vn30List");
+
+    const VN30_SYMBOLS = [
+      "ACB", "BCM", "BID", "BVH", "CTG", "FPT", "GAS", "GVR", "HDB", "HPG",
+      "MBB", "MSN", "MWG", "PLX", "POW", "SAB", "SHB", "SSB", "SSI", "STB",
+      "TCB", "TPB", "VCB", "VHM", "VIB", "VIC", "VJC", "VNM", "VPB", "VRE"
+    ];
+    vn30ListEl.innerHTML = VN30_SYMBOLS.map((s) => `<option value="${s}"></option>`).join("");
 
     let refreshTimer = null;
 
@@ -295,6 +304,7 @@
     }
 
     document.getElementById("loadBtn").addEventListener("click", loadData);
+    document.getElementById("symbol").addEventListener("change", loadData);
     refreshSec.addEventListener("change", () => {
       startAutoRefresh();
       loadData();
