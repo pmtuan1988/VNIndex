@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+import os
 from pathlib import Path
 
 from flask import Flask, jsonify, send_from_directory
@@ -9,7 +10,7 @@ from vnstock import stock_historical_data
 BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR / "web"
 
-app = Flask(__name__, static_folder=str(WEB_DIR), static_url_path="/static")
+app = Flask(__name__)
 
 
 def _to_number(value):
@@ -99,4 +100,5 @@ def home():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    debug = os.getenv("FLASK_DEBUG", "0") == "1"
+    app.run(host="0.0.0.0", port=8000, debug=debug)
