@@ -1,24 +1,11 @@
 from __future__ import annotations
 
 import json
-import os
 from datetime import date, timedelta, datetime, timezone
 from pathlib import Path
 
 # Self-contained fetch — no dependency on the MCP server module
 SOURCES = ["TCBS", "DNSE", "KBS", "VCI"]
-
-
-def _fetch_shb_fireant(symbol: str = "SHB", days: int = 30):
-    """Fetch from FireAnt API if FIREANT_TOKEN env var is set."""
-    token = os.environ.get("FIREANT_TOKEN", "").strip()
-    if not token:
-        raise ValueError("FIREANT_TOKEN not set")
-    # Import here so vnstock import errors don't block FireAnt path
-    import sys
-    sys.path.insert(0, str(Path(__file__).parent.parent))
-    from scripts.fireant_client import fetch_shb_30d
-    return fetch_shb_30d(token=token, symbol=symbol, days=days)
 
 
 def _fetch_shb(symbol: str = "SHB", days: int = 30):
@@ -61,26 +48,19 @@ def main() -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
 
     try:
-        # FireAnt preferred — exact historical data
-        payload = _fetch_shb_fireant(symbol="SHB", days=30)
-        print(f"FireAnt OK: rows={payload.get('rows')}")
-    except Exception as fa_exc:
-        print(f"FireAnt unavailable ({fa_exc}), falling back to vnstock...")
-        try:
-            payload = _fetch_shb(symbol="SHB", days=30)
-        except Exception as exc:
-            if output.exists():
-                payload = json.loads(output.read_text(encoding="utf-8"))
-                payload["updated_at"] = datetime.now(timezone.utc).isoformat()
-                payload["last_error"] = str(exc)
-                payload["stale"] = True
-                print("WARN: all sources failed, keeping last data")
-                with output.open("w", encoding="utf-8") as f:
-                    json.dump(payload, f, ensure_ascii=False, indent=2)
-                print(f"Kept stale data rows={payload.get('rows')}")
-                return
-            else:
-                raise
+        payload = _fetch_shb(symbol="SHB", days=30)
+    except Exception as exc:
+        print(f"WARN: fetch failed ({exc}), keeping last data")
+        if output.exists():
+            payload = json.loads(output.read_text(encoding="utf-8"))
+            payload["updated_at"] = datetime.now(timezone.utc).isoformat()
+            payload["last_error"] = str(exc)
+            payload["stale"] = True
+            with output.open("w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False, indent=2)
+            print(f"Kept stale data rows={payload.get('rows')}")
+            return
+        raise
 
     payload["updated_at"] = datetime.now(timezone.utc).isoformat()
     payload["stale"] = False
@@ -89,7 +69,7 @@ def main() -> None:
     with output.open("w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
-    print(f"Updated {output} rows={payload.get('rows')} source={payload.get('source_used')} stale=False")
+    print(f"Updated {output} rows={payload.get('rows')} source={payload.get('source_used')} stale={payload.get('stale')}")
 
 
 if __name__ == "__main__":
