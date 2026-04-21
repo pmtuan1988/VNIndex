@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VNIndex Live Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-a: #061a2a;
+      --bg-b: #133b5c;
+      --ink: #e9f3fb;
+      --muted: #9fc3dd;
+      --accent: #6df7c1;
+      --danger: #ff6a8b;
+      --card: rgba(7, 20, 34, 0.72);
+      --line: rgba(159, 195, 221, 0.25);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 15% -10%, rgba(109, 247, 193, 0.25), transparent 60%),
+        radial-gradient(900px 500px at 95% 0%, rgba(64, 178, 255, 0.25), transparent 60%),
+        linear-gradient(160deg, var(--bg-a), var(--bg-b));
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      width: min(1100px, 94vw);
+      margin: 28px auto;
+      display: grid;
+      gap: 20px;
+      animation: fade-up 500ms ease both;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .head {
+      padding: 18px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      letter-spacing: 0.02em;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input, select, button {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font: inherit;
+    }
+
+    button {
+      background: linear-gradient(135deg, #19c8a3, #35a4ff);
+      color: #00151f;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      padding: 0 20px 20px;
+    }
+
+    .stat {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.16);
+    }
+
+    .label { color: var(--muted); font-size: 0.88rem; }
+    .value { margin-top: 6px; font-size: 1.1rem; font-weight: 700; }
+
+    .table-wrap {
+      padding: 0 20px 20px;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 8px;
+      white-space: nowrap;
+    }
+
+    th { color: var(--muted); font-weight: 500; }
+
+    .pos { color: var(--accent); font-weight: 700; }
+    .neg { color: var(--danger); font-weight: 700; }
+
+    .foot {
+      color: var(--muted);
+      padding: 0 20px 20px;
+      font-size: 0.9rem;
+    }
+
+    .err {
+      margin: 0 20px 20px;
+      padding: 12px;
+      border: 1px solid rgba(255, 106, 139, 0.45);
+      border-radius: 12px;
+      background: rgba(255, 106, 139, 0.08);
+      color: #ffd8e2;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="panel">
+      <div class="head">
+        <h1>VNIndex Live Board</h1>
+        <div class="controls">
+          <input id="symbol" maxlength="5" value="SHB" aria-label="Mã cổ phiếu" />
+          <select id="days" aria-label="Số phiên">
+            <option value="15">15 phiên</option>
+            <option value="30" selected>30 phiên</option>
+            <option value="60">60 phiên</option>
+          </select>
+          <select id="refreshSec" aria-label="Chu kỳ tự động tải">
+            <option value="0">Tắt auto refresh</option>
+            <option value="5">5 giây</option>
+            <option value="10" selected>10 giây</option>
+          </select>
+          <button id="loadBtn">Tải dữ liệu</button>
+        </div>
+      </div>
+
+      <div class="stats" id="stats"></div>
+      <div class="err" id="err"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Mở cửa</th>
+              <th>Cao nhất</th>
+              <th>Thấp nhất</th>
+              <th>Đóng cửa</th>
+              <th>Khối lượng</th>
+              <th>Biến động</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="foot" id="foot">Đang chờ dữ liệu...</div>
+    </section>
+  </main>
+
+  <script>
+    const stats = document.getElementById("stats");
+    const rows = document.getElementById("rows");
+    const foot = document.getElementById("foot");
+    const err = document.getElementById("err");
+    const refreshSec = document.getElementById("refreshSec");
+
+    let refreshTimer = null;
+
+    function formatNumber(n) {
+      return new Intl.NumberFormat("vi-VN").format(n);
+    }
+
+    function formatPrice(v) {
+      return Number(v).toFixed(2);
+    }
+
+    function renderStats(payload) {
+      const data = payload.data || [];
+      const last = data[data.length - 1] || {};
+      const prev = data[data.length - 2] || {};
+      const delta = Number(last.close || 0) - Number(prev.close || 0);
+      const trendClass = delta >= 0 ? "pos" : "neg";
+      const trendSign = delta >= 0 ? "+" : "";
+
+      stats.innerHTML = [
+        ["Mã", payload.symbol],
+        ["Nguồn dùng", payload.source_used],
+        ["Số phiên", payload.rows],
+        ["Đóng cửa gần nhất", formatPrice(last.close || 0)],
+        ["Biến động", `<span class="${trendClass}">${trendSign}${formatPrice(delta)}</span>`]
+      ].map(([label, value]) => `
+        <article class="stat">
+          <div class="label">${label}</div>
+          <div class="value">${value}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderRows(payload) {
+      const data = payload.data || [];
+      rows.innerHTML = data.slice().reverse().map((r, idx) => {
+        const prev = data[data.length - idx - 2];
+        const delta = prev ? Number(r.close) - Number(prev.close) : 0;
+        const cls = delta >= 0 ? "pos" : "neg";
+        const sign = delta >= 0 ? "+" : "";
+        return `
+          <tr>
+            <td>${new Date(r.time).toLocaleString("vi-VN")}</td>
+            <td>${formatPrice(r.open)}</td>
+            <td>${formatPrice(r.high)}</td>
+            <td>${formatPrice(r.low)}</td>
+            <td>${formatPrice(r.close)}</td>
+            <td>${formatNumber(r.volume)}</td>
+            <td class="${cls}">${sign}${formatPrice(delta)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function loadData() {
+      const symbol = document.getElementById("symbol").value.trim().toUpperCase() || "SHB";
+      const days = Number(document.getElementById("days").value || "30");
+
+      err.style.display = "none";
+      foot.textContent = "Đang tải dữ liệu...";
+
+      try {
+        const resp = await fetch(`/api/stock/${symbol}?days=${days}`);
+        if (!resp.ok) {
+          const text = await resp.text();
+          throw new Error(text || `HTTP ${resp.status}`);
+        }
+
+        const payload = await resp.json();
+        renderStats(payload);
+        renderRows(payload);
+        foot.textContent = `Cập nhật lúc ${new Date().toLocaleString("vi-VN")} | Ưu tiên nguồn: TCBS -> DNSE -> KBS -> VCI`;
+      } catch (e) {
+        err.textContent = `Lỗi tải dữ liệu: ${e.message}`;
+        err.style.display = "block";
+        foot.textContent = "Tải dữ liệu thất bại";
+      }
+    }
+
+    function startAutoRefresh() {
+      if (refreshTimer) {
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+      }
+
+      const sec = Number(refreshSec.value || "0");
+      if (sec <= 0) {
+        return;
+      }
+
+      refreshTimer = setInterval(() => {
+        loadData();
+      }, sec * 1000);
+    }
+
+    document.getElementById("loadBtn").addEventListener("click", loadData);
+    refreshSec.addEventListener("change", () => {
+      startAutoRefresh();
+      loadData();
+    });
+
+    startAutoRefresh();
+    loadData();
+  </script>
+</body>
+</html>

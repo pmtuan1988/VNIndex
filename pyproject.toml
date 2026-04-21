@@ -1,0 +1,20 @@
+[project]
+name = "vnindex"
+version = "0.1.0"
+description = "VN stock MCP integration with vnstock"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115.0",
+  "mcp>=1.10.0",
+  "pandas>=2.2.3",
+  "uvicorn>=0.30.0",
+  "vnstock>=3.5.1"
+]
+
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = false
