@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SHB - Dữ liệu 1 tháng (TCBS/DNSE)</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 24px;
+        color: #1f2937;
+      }
+      h1 {
+        margin-bottom: 8px;
+      }
+      .hint {
+        margin-bottom: 20px;
+        color: #6b7280;
+      }
+      .source {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .stat {
+        background: #f3f4f6;
+        border-radius: 6px;
+        padding: 8px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th,
+      td {
+        border: 1px solid #e5e7eb;
+        padding: 6px 8px;
+        text-align: right;
+      }
+      th:first-child,
+      td:first-child {
+        text-align: left;
+      }
+      .error {
+        color: #b91c1c;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SHB - Thông tin giao dịch 1 tháng</h1>
+    <div class="hint">Nguồn dữ liệu: vnstock + TCBS/DNSE</div>
+    <div id="content">Đang tải dữ liệu...</div>
+
+    <script>
+      const fmt = (num) =>
+        typeof num === "number"
+          ? new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 2 }).format(num)
+          : "-";
+
+      function renderSource(name, sourceData) {
+        if (sourceData.error) {
+          return `<div class="source"><h2>${name}</h2><div class="error">${sourceData.error}</div></div>`;
+        }
+
+        const rows = sourceData.trades
+          .map(
+            (r) => `
+          <tr>
+            <td>${r.time}</td>
+            <td>${fmt(r.open)}</td>
+            <td>${fmt(r.high)}</td>
+            <td>${fmt(r.low)}</td>
+            <td>${fmt(r.close)}</td>
+            <td>${fmt(r.volume)}</td>
+          </tr>`
+          )
+          .join("");
+
+        return `
+        <div class="source">
+          <h2>${name}</h2>
+          <div class="stats">
+            <div class="stat"><strong>Số phiên:</strong> ${sourceData.records}</div>
+            <div class="stat"><strong>TB giá đóng cửa:</strong> ${fmt(sourceData.summary.avg_close)}</div>
+            <div class="stat"><strong>Cao nhất:</strong> ${fmt(sourceData.summary.max_close)}</div>
+            <div class="stat"><strong>Thấp nhất:</strong> ${fmt(sourceData.summary.min_close)}</div>
+            <div class="stat"><strong>Tổng KL:</strong> ${fmt(sourceData.summary.total_volume)}</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Mở cửa</th>
+                <th>Cao nhất</th>
+                <th>Thấp nhất</th>
+                <th>Đóng cửa</th>
+                <th>Khối lượng</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+      }
+
+      async function init() {
+        const container = document.getElementById("content");
+        try {
+          const res = await fetch("/api/shb/last-month");
+          const data = await res.json();
+          container.innerHTML = ["TCBS", "DNSE"].map((s) => renderSource(s, data.sources[s])).join("");
+        } catch (error) {
+          container.innerHTML = `<div class="error">Không tải được dữ liệu: ${error.message}</div>`;
+        }
+      }
+
+      init();
+    </script>
+  </body>
+</html>
