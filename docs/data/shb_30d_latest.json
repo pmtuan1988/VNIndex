@@ -237,18 +237,18 @@
       "volume": 97117400
     },
     {
-      "time": "2026-04-23T07:00:00",
-      "open": 15.15,
-      "high": 15.2,
-      "low": 14.8,
-      "close": 14.8,
-      "volume": 97117400
+      "time": "2026-04-24T07:00:00",
+      "open": 14.8,
+      "high": 14.85,
+      "low": 14.65,
+      "close": 14.7,
+      "volume": 13930700
     }
   ],
   "source_errors": {
     "TCBS": "Supported sources: KBS, VCI, MSN, FMP. Got: TCBS",
     "DNSE": "Supported sources: KBS, VCI, MSN, FMP. Got: DNSE"
   },
-  "updated_at": "2026-04-24T00:03:55.774948+00:00",
+  "updated_at": "2026-04-24T03:43:32.363022+00:00",
   "stale": false
 }
