@@ -5,14 +5,6 @@
   "rows": 30,
   "data": [
     {
-      "time": "2026-06-12T07:00:00",
-      "open": 13.75,
-      "high": 13.85,
-      "low": 13.65,
-      "close": 13.8,
-      "volume": 58486500
-    },
-    {
       "time": "2026-06-15T07:00:00",
       "open": 13.9,
       "high": 14.0,
@@ -243,13 +235,20 @@
       "low": 11.4,
       "close": 12.0,
       "volume": 92228500
+    },
+    {
+      "time": "2026-07-24T07:00:00",
+      "open": 11.95,
+      "high": 11.95,
+      "low": 11.7,
+      "close": 11.7,
+      "volume": 9976500
     }
   ],
   "source_errors": {
     "TCBS": "Supported sources: KBS, VCI, MSN, FMP. Got: TCBS",
     "DNSE": "Supported sources: KBS, VCI, MSN, FMP. Got: DNSE"
   },
-  "updated_at": "2026-07-24T02:15:56.025734+00:00",
-  "stale": true,
-  "last_error": "All sources failed: {'TCBS': 'Supported sources: KBS, VCI, MSN, FMP. Got: TCBS', 'DNSE': 'Supported sources: KBS, VCI, MSN, FMP. Got: DNSE', 'KBS': 'RetryError[<Future at 0x7ffa196b10a0 state=finished raised ConnectionError>]', 'VCI': \"'data'\"}"
+  "updated_at": "2026-07-24T03:27:35.147956+00:00",
+  "stale": false
 }
