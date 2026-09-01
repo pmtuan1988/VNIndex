@@ -249,6 +249,7 @@
     "TCBS": "Supported sources: KBS, VCI, MSN, FMP. Got: TCBS",
     "DNSE": "Supported sources: KBS, VCI, MSN, FMP. Got: DNSE"
   },
-  "updated_at": "2026-09-01T09:44:59.139948+00:00",
-  "stale": false
+  "updated_at": "2026-09-01T09:53:02.086250+00:00",
+  "stale": true,
+  "last_error": "All sources failed: {'TCBS': 'Supported sources: KBS, VCI, MSN, FMP. Got: TCBS', 'DNSE': 'Supported sources: KBS, VCI, MSN, FMP. Got: DNSE', 'KBS': 'RetryError[<Future at 0x7f4ea3d868a0 state=finished raised ConnectionError>]', 'VCI': \"'data'\"}"
 }
