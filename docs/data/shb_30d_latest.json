@@ -242,14 +242,13 @@
       "high": 11.9,
       "low": 11.8,
       "close": 11.85,
-      "volume": 15447400
+      "volume": 16516100
     }
   ],
   "source_errors": {
     "TCBS": "Supported sources: KBS, VCI, MSN, FMP. Got: TCBS",
     "DNSE": "Supported sources: KBS, VCI, MSN, FMP. Got: DNSE"
   },
-  "updated_at": "2026-09-08T06:54:52.426693+00:00",
-  "stale": true,
-  "last_error": "All sources failed: {'TCBS': 'Supported sources: KBS, VCI, MSN, FMP. Got: TCBS', 'DNSE': 'Supported sources: KBS, VCI, MSN, FMP. Got: DNSE', 'KBS': 'RetryError[<Future at 0x7fb314246870 state=finished raised ConnectionError>]', 'VCI': \"'data'\"}"
+  "updated_at": "2026-09-08T07:01:42.342809+00:00",
+  "stale": false
 }
