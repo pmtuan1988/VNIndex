@@ -5,14 +5,6 @@
   "rows": 30,
   "data": [
     {
-      "time": "2026-08-05T07:00:00",
-      "open": 11.8,
-      "high": 11.9,
-      "low": 11.65,
-      "close": 11.8,
-      "volume": 50594900
-    },
-    {
       "time": "2026-08-06T07:00:00",
       "open": 11.85,
       "high": 11.85,
@@ -243,12 +235,20 @@
       "low": 11.5,
       "close": 11.8,
       "volume": 51778900
+    },
+    {
+      "time": "2026-09-18T07:00:00",
+      "open": 11.6,
+      "high": 11.8,
+      "low": 11.5,
+      "close": 11.8,
+      "volume": 51778900
     }
   ],
   "source_errors": {
     "TCBS": "Supported sources: KBS, VCI, MSN, FMP. Got: TCBS",
     "DNSE": "Supported sources: KBS, VCI, MSN, FMP. Got: DNSE"
   },
-  "updated_at": "2026-09-20T23:50:43.171389+00:00",
+  "updated_at": "2026-09-21T00:03:40.431012+00:00",
   "stale": false
 }
