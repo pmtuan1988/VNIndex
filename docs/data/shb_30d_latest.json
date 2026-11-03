@@ -239,16 +239,16 @@
     {
       "time": "2026-11-03T07:00:00",
       "open": 10.4,
-      "high": 10.5,
+      "high": 10.7,
       "low": 10.3,
-      "close": 10.45,
-      "volume": 27797400
+      "close": 10.55,
+      "volume": 34836700
     }
   ],
   "source_errors": {
     "TCBS": "Supported sources: KBS, VCI, MSN, FMP. Got: TCBS",
     "DNSE": "Supported sources: KBS, VCI, MSN, FMP. Got: DNSE"
   },
-  "updated_at": "2026-11-03T06:22:52.010429+00:00",
+  "updated_at": "2026-11-03T06:35:00.296295+00:00",
   "stale": false
 }
