@@ -241,14 +241,14 @@
       "open": 10.55,
       "high": 10.65,
       "low": 10.5,
-      "close": 10.55,
-      "volume": 14744100
+      "close": 10.65,
+      "volume": 15827300
     }
   ],
   "source_errors": {
     "TCBS": "Supported sources: KBS, VCI, MSN, FMP. Got: TCBS",
     "DNSE": "Supported sources: KBS, VCI, MSN, FMP. Got: DNSE"
   },
-  "updated_at": "2026-11-06T06:24:01.819868+00:00",
+  "updated_at": "2026-11-06T06:35:23.777545+00:00",
   "stale": false
 }
